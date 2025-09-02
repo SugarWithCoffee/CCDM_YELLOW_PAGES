@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCDM Yellow Pages</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            border-top: 4px solid #facc15; 
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.25rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .header p {
+            font-size: 1rem;
+            color: #6b7280;
+            font-weight: 400;
+        }
+
+        .controls {
+            padding: 24px 30px;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #ffffff;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #facc15;
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.3);
+        }
+
+        .filter-select {
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #ffffff;
+            color: #374151;
+            min-width: 180px;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #facc15;
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.3);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 24px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .person-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e5e7eb;
+            transition: box-shadow 0.2s, transform 0.2s;
+            cursor: pointer;
+        }
+
+        .person-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .person-card.expanded {
+            cursor: default;
+        }
+
+        .expand-indicator {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-align: center;
+            margin-top: 16px;
+            padding: 8px;
+            background: #f9fafb;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .expand-indicator:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .work-experience {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f3f4f6;
+            display: none;
+        }
+
+        .work-experience.visible {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .work-experience h3 {
+            font-size: 0.875rem;
+            margin-bottom: 12px;
+            color: #374151;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .experience-tag {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .experience-experienced {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #bbf7d0;
+        }
+
+        .experience-done-a-little {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #fde68a;
+        }
+
+        .experience-willing-to-learn {
+            background: #f3f4f6;
+            color: #374151;
+            border-color: #d1d5db;
+        }
+
+        .person-header {
+            border-bottom: 1px solid #f3f4f6;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+
+        .person-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .person-email {
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 400;
+        }
+
+        .skills-section h3 {
+            font-size: 0.875rem;
+            margin-bottom: 12px;
+            color: #374151;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tag {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid;
+            transition: all 0.2s;
+        }
+
+        .skill-experienced {
+            background: #059669;
+            color: #ffffff;
+            border-color: #047857;
+            font-weight: 600;
+        }
+
+        .skill-proficient {
+            background: #0891b2;
+            color: #ffffff;
+            border-color: #0e7490;
+            font-weight: 600;
+        }
+
+        .skill-can-manage {
+            background: #facc15;
+            color: #422006;
+            border-color: #eab308;
+            font-weight: 500;
+        }
+
+        .skill-slightly-used {
+            background: #f3f4f6;
+            color: #374151;
+            border-color: #d1d5db;
+            font-weight: 500;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 80px 20px;
+            color: #6b7280;
+            background: #f8f9fa;
+        }
+
+        .no-results h3 {
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+            color: #374151;
+            font-weight: 600;
+        }
+
+        .no-results p {
+            font-size: 0.875rem;
+        }
+
+        .stats-bar {
+            background: #ffffff;
+            padding: 16px 30px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .disclaimer {
+            background: #fefce8;
+            border-top: 1px solid #fde68a;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #78350f;
+        }
+        .disclaimer a {
+            color: #78350f;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid #fde68a;
+            transition: all 0.2s;
+        }
+        .disclaimer a:hover {
+            background: #fde68a;
+            border-bottom-color: #facc15;
+        }
+
+        /* ADD THIS NEW CSS */
+        .footer {
+        background: #ffffff;
+        color: #6b7280;
+        padding: 20px 30px;
+        text-align: center;
+        font-size: 0.875rem;
+        border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer p {
+            margin: 0;
+            color: #9ca3af;
+        }
+
+        .skill-legend {
+            padding: 20px 30px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+
+        .legend-color.skill-experienced {
+            background: #059669;
+            border-color: #047857;
+        }
+
+        .legend-color.skill-proficient {
+            background: #0891b2;
+            border-color: #0e7490;
+        }
+        
+        .legend-color.skill-can-manage {
+            background: #facc15;
+            border-color: #eab308;
+        }
+
+        .legend-color.skill-slightly-used {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.875rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .team-grid {
+                grid-template-columns: 1fr;
+                padding: 20px;
+                gap: 16px;
+            }
+            
+            .person-card {
+                padding: 20px;
+            }
+
+            .skill-legend {
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CCDM Yellow Pages</h1>
+            <p>Find the right team member for your project</p>
+        </div>
+
+        <div class="skill-legend">
+            <div class="legend-item">
+                <div class="legend-color skill-experienced"></div>
+                <span>Experienced</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color skill-proficient"></div>
+                <span>Proficient</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color skill-can-manage"></div>
+                <span>Can Manage</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color skill-slightly-used"></div>
+                <span>Slightly Used</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by name, email, or software...">
+            </div>
+            <select id="softwareFilter" class="filter-select">
+                <option value="">All Software</option>
+            </select>
+            <select id="skillFilter" class="filter-select">
+                <option value="">All Skill Levels</option>
+            </select>
+        </div>
+
+        <div id="teamGrid" class="team-grid">
+            </div>
+
+        <div id="noResults" class="no-results" style="display: none;">
+            <h3>No team members found</h3>
+            <p>Try adjusting your search criteria</p>
+        </div>
+
+        <div class="stats-bar">
+            <span id="statsText">Loading team data...</span>
+        </div>
+        
+        <div class="disclaimer">
+            <p>Have you learned something new or received extra training? <a href="mailto:leadership@example.com?subject=Skills%20Update">Write an email to leadership for an update.</a></p>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 Center for Communication and Digital Media. All rights reserved. | Centro para la Comunicación y Medios Digitales. Todos los derechos reservados :D</p>
+        </div>
+    </div>
+
+    <script>
+        // Correct CCDM team data
+        const teamData = [
+            {
+                "name": "Alexis Smith",
+                "email": "SMITHA79 at my.erau.edu",
+                "skills": {
+                    "iMovie": "Slightly Used",
+                    "Adobe Photoshop (Photo)": "Slightly Used",
+                    "Canva": "Can Manage",
+                    "Microsoft PowerPoint": "Slightly Used"
+                },
+                "experience": {
+                    "Audio Editing": "Willing To Learn",
+                    "Video Editing": "Willing To Learn",
+                    "Photo Editing": "Done A Little",
+                    "Infographic Creation": "Done A Little",
+                    "Photography": "Done A Little",
+                    "Videography": "Willing To Learn",
+                    "Animation Creation": "Willing To Learn"
+                }
+            },
+            {
+                "name": "Bastien Melin",
+                "email": "MELINB1 at my.erau.edu",
+                "skills": {
+                    "Audacity": "Proficient",
+                    "Adobe Audition": "Proficient",
+                    "iMovie": "Can Manage",
+                    "Adobe Premiere Pro": "Experienced",
+                    "Adobe Lightroom Classic": "Experienced",
+                    "Adobe Photoshop (Photo)": "Proficient",
+                    "Canva": "Can Manage",
+                    "Adobe Illustrator": "Experienced",
+                    "Adobe Photoshop (Graphics)": "Can Manage",
+                    "Microsoft PowerPoint": "Experienced"
+                },
+                "experience": {
+                    "Audio Editing": "Experienced",
+                    "Video Editing": "Experienced",
+                    "Photo Editing": "Experienced",
+                    "Infographic Creation": "Experienced",
+                    "Photography": "Experienced",
+                    "Videography": "Experienced",
+                    "Animation Creation": "Willing To Learn"
+                }
+            },
+            {
+                "name": "Carissa Aumack",
+                "email": "AUMACKC1 at my.erau.edu",
+                "skills": {
+                    "iMovie": "Can Manage",
+                    "Adobe Premiere Pro": "Slightly Used",
+                    "Adobe Lightroom Classic": "Proficient",
+                    "Adobe Photoshop (Photo)": "Proficient",
+                    "Canva": "Proficient",
+                    "Adobe Photoshop (Graphics)": "Experienced",
+                    "Microsoft PowerPoint": "Proficient",
+                    "Blender": "Slightly Used",
+                    "Adobe After Effects": "Slightly Used"
+                },
+                "experience": {
+                    "Audio Editing": "Done A Little",
+                    "Video Editing": "Experienced",
+                    "Photo Editing": "Experienced",
+                    "Infographic Creation": "Experienced",
+                    "Photography": "Experienced",
+                    "Videography": "Experienced",
+                    "Animation Creation": "Done A Little"
+                }
+            },
+            {
+                "name": "Christopher Anderson",
+                "email": "ANDERC93 at my.erau.edu",
+                "skills": {
+                    "Audacity": "Can Manage",
+                    "iMovie": "Slightly Used",
+                    "Adobe Premiere Pro": "Slightly Used",
+                    "Adobe Photoshop (Photo)": "Proficient",
+                    "Canva": "Can Manage",
+                    "Adobe Illustrator": "Can Manage",
+                    "Adobe Photoshop (Graphics)": "Proficient",
+                    "Microsoft PowerPoint": "Proficient",
+                    "Blender": "Can Manage",
+                    "Adobe After Effects": "Slightly Used"
+                },
+                "experience": {
+                    "Audio Editing": "Done A Little",
+                    "Video Editing": "Done A Little",
+                    "Photo Editing": "Experienced",
+                    "Infographic Creation": "Experienced",
+                    "Photography": "Experienced",
+                    "Videography": "Done A Little",
+                    "Animation Creation": "Done A Little"
+                }
+            },
+            {
+                "name": "Gabriel Fredrich",
+                "email": "FREDRIG1 at my.erau.edu",
+                "skills": {
+                    "Adobe Photoshop (Photo)": "Slightly Used",
+                    "Canva": "Can Manage",
+                    "Adobe Photoshop (Graphics)": "Slightly Used",
+                    "Microsoft PowerPoint": "Proficient"
+                },
+                "experience": {
+                    "Audio Editing": "Willing To Learn",
+                    "Video Editing": "Willing To Learn",
+                    "Photo Editing": "Done A Little",
+                    "Infographic Creation": "Done A Little",
+                    "Photography": "Done A Little",
+                    "Videography": "Willing To Learn",
+                    "Animation Creation": "Willing To Learn"
+                }
+            },
+            {
+                "name": "Heidi Moyer",
+                "email": "MOYERH2 at my.erau.edu",
+                "skills": {
+                    "Audacity": "Slightly Used",
+                    "iMovie": "Experienced",
+                    "Canva": "Experienced",
+                    "Microsoft PowerPoint": "Can Manage"
+                },
+                "experience": {
+                    "Audio Editing": "Done A Little",
+                    "Video Editing": "Experienced",
+                    "Photo Editing": "Done A Little",
+                    "Infographic Creation": "Experienced",
+                    "Photography": "Done A Little",
+                    "Videography": "Experienced",
+                    "Animation Creation": "Willing To Learn"
+                }
+            },
+            {
+                "name": "Jacob Blanton",
+                "email": "BLANTOJ5 at my.erau.edu",
+                "skills": {
+                    "Audacity": "Can Manage",
+                    "Adobe Audition": "Slightly Used",
+                    "iMovie": "Experienced",
+                    "Adobe Premiere Pro": "Proficient",
+                    "Adobe Photoshop (Photo)": "Slightly Used",
+                    "Canva": "Slightly Used",
+                    "Adobe Photoshop (Graphics)": "Slightly Used",
+                    "Microsoft PowerPoint": "Experienced"
+                },
+                "experience": {
+                    "Audio Editing": "Done A Little",
+                    "Video Editing": "Experienced",
+                    "Photo Editing": "Done A Little",
+                    "Infographic Creation": "Done A Little",
+                    "Photography": "Experienced",
+                    "Videography": "Experienced",
+                    "Animation Creation": "Willing To Learn"
+                }
+            },
+            {
+                "name": "Kaycie Williams",
+                "email": "WILLK116 at my.erau.edu",
+                "skills": {
+                    "Audacity": "Can Manage",
+                    "iMovie": "Experienced",
+                    "Adobe Premiere Pro": "Slightly Used",
+                    "Adobe Photoshop (Photo)": "Slightly Used",
+                    "Canva": "Experienced",
+                    "Adobe Photoshop (Graphics)": "Slightly Used",
+                    "Microsoft PowerPoint": "Experienced"
+                },
+                "experience": {
+                    "Audio Editing": "Done A Little",
+                    "Video Editing": "Experienced",
+                    "Photo Editing": "Done A Little",
+                    "Infographic Creation": "Experienced",
+                    "Photography": "Experienced",
+                    "Videography": "Experienced",
+                    "Animation Creation": "Willing To Learn"
+                }
+            },
+            {
+                "name": "Mackenzie Logie",
+                "email": "LOGIEM at my.erau.edu",
+                "skills": {
+                    "iMovie": "Can Manage",
+                    "Adobe Lightroom Classic": "Proficient",
+                    "Adobe Photoshop (Photo)": "Proficient",
+                    "Canva": "Can Manage",
+                    "Adobe Illustrator": "Slightly Used",
+                    "Adobe Photoshop (Graphics)": "Can Manage",
+                    "Microsoft PowerPoint": "Experienced"
+                },
+                "experience": {
+                    "Audio Editing": "Willing To Learn",
+                    "Video Editing": "Done A Little",
+                    "Photo Editing": "Experienced",
+                    "Infographic Creation": "Experienced",
+                    "Photography": "Experienced",
+                    "Videography": "Done A Little",
+                    "Animation Creation": "Willing To Learn"
+                }
+            },
+            {
+                "name": "Mia Nilsen",
+                "email": "NILSENM at my.erau.edu",
+                "skills": {
+                    "Audacity": "Slightly Used",
+                    "Canva": "Experienced",
+                    "Microsoft PowerPoint": "Can Manage"
+                },
+                "experience": {
+                    "Audio Editing": "Done A Little",
+                    "Video Editing": "Willing To Learn",
+                    "Photo Editing": "Done A Little",
+                    "Infographic Creation": "Experienced",
+                    "Photography": "Done A Little",
+                    "Videography": "Willing To Learn",
+                    "Animation Creation": "Willing To Learn"
+                }
+            },
+            {
+                "name": "Mikailah Feinman",
+                "email": "FEINMANM at my.erau.edu",
+                "skills": {
+                    "Canva": "Can Manage",
+                    "Microsoft PowerPoint": "Proficient"
+                },
+                "experience": {
+                    "Audio Editing": "Willing To Learn",
+                    "Video Editing": "Willing To Learn",
+                    "Photo Editing": "Willing To Learn",
+                    "Infographic Creation": "Done A Little",
+                    "Photography": "Willing To Learn",
+                    "Videography": "Willing To Learn",
+                    "Animation Creation": "Willing To Learn"
+                }
+            },
+            {
+                "name": "Monika Nortvest",
+                "email": "NORTVESM at my.erau.edu",
+                "skills": {
+                    "Adobe Premiere Pro": "Slightly Used",
+                    "Adobe Lightroom Classic": "Can Manage",
+                    "Adobe Photoshop (Photo)": "Slightly Used",
+                    "Canva": "Experienced",
+                    "Adobe Illustrator": "Proficient",
+                    "Adobe Photoshop (Graphics)": "Can Manage",
+                    "Microsoft PowerPoint": "Experienced",
+                    "Adobe InDesign": "Slightly Used",
+                    "Blender": "Slightly Used"
+                },
+                "experience": {
+                    "Audio Editing": "Willing To Learn",
+                    "Video Editing": "Done A Little",
+                    "Photo Editing": "Done A Little",
+                    "Infographic Creation": "Experienced",
+                    "Photography": "Done A Little",
+                    "Videography": "Done A Little",
+                    "Animation Creation": "Done A Little"
+                }
+            },
+            {
+                "name": "Omar Dadani",
+                "email": "DADANIO at my.erau.edu",
+                "skills": {
+                    "Canva": "Experienced",
+                    "Microsoft PowerPoint": "Proficient"
+                },
+                "experience": {
+                    "Audio Editing": "Willing To Learn",
+                    "Video Editing": "Willing To Learn",
+                    "Photo Editing": "Willing To Learn",
+                    "Infographic Creation": "Done A Little",
+                    "Photography": "Willing To Learn",
+                    "Videography": "Willing To Learn",
+                    "Animation Creation": "Willing To Learn"
+                }
+            },
+            {
+                "name": "Sahil Parag Koticha",
+                "email": "KOTICHAS at my.erau.edu",
+                "skills": {
+                    "Audacity": "Slightly Used",
+                    "iMovie": "Slightly Used",
+                    "Canva": "Slightly Used",
+                    "Microsoft PowerPoint": "Can Manage"
+                },
+                "experience": {
+                    "Audio Editing": "Willing To Learn",
+                    "Video Editing": "Willing To Learn",
+                    "Photo Editing": "Done A Little",
+                    "Infographic Creation": "Done A Little",
+                    "Photography": "Done A Little",
+                    "Videography": "Willing To Learn",
+                    "Animation Creation": "Willing To Learn"
+                }
+            },
+            {
+                "name": "Santiago Acuna Gonzalez",
+                "email": "ACUNAS1 at my.erau.edu",
+                "skills": {
+                    "Audacity": "Experienced",
+                    "Adobe Audition": "Experienced",
+                    "iMovie": "Experienced",
+                    "Adobe Premiere Pro": "Experienced",
+                    "Adobe Lightroom Classic": "Can Manage",
+                    "Adobe Photoshop (Photo)": "Experienced",
+                    "Canva": "Experienced",
+                    "Adobe Illustrator": "Experienced",
+                    "Adobe Photoshop (Graphics)": "Experienced",
+                    "Microsoft PowerPoint": "Experienced",
+                    "Adobe InDesign": "Slightly Used",
+                    "Blender": "Slightly Used",
+                    "Adobe After Effects": "Can Manage"
+                },
+                "experience": {
+                    "Audio Editing": "Experienced",
+                    "Video Editing": "Experienced",
+                    "Photo Editing": "Experienced",
+                    "Infographic Creation": "Experienced",
+                    "Photography": "Experienced",
+                    "Videography": "Experienced",
+                    "Animation Creation": "Done A Little"
+                }
+            },
+            {
+                "name": "Scott Cumings",
+                "email": "CUMINGSS at my.erau.edu",
+                "skills": {
+                    "Audacity": "Experienced",
+                    "Adobe Audition": "Can Manage",
+                    "iMovie": "Experienced",
+                    "Adobe Premiere Pro": "Experienced",
+                    "Adobe Lightroom Classic": "Proficient",
+                    "Adobe Photoshop (Photo)": "Proficient",
+                    "Canva": "Experienced",
+                    "Adobe Illustrator": "Proficient",
+                    "Adobe Photoshop (Graphics)": "Proficient",
+                    "Microsoft PowerPoint": "Proficient",
+                    "Adobe InDesign": "Proficient",
+                    "Adobe After Effects": "Proficient"
+                },
+                "experience": {
+                    "Audio Editing": "Experienced",
+                    "Video Editing": "Experienced",
+                    "Photo Editing": "Experienced",
+                    "Infographic Creation": "Experienced",
+                    "Photography": "Experienced",
+                    "Videography": "Experienced",
+                    "Animation Creation": "Done A Little"
+                }
+            },
+            {
+                "name": "Timothy Schroeder",
+                "email": "SCHROET5 at my.erau.edu",
+                "skills": {
+                    "Audacity": "Can Manage",
+                    "iMovie": "Slightly Used",
+                    "Adobe Premiere Pro": "Can Manage",
+                    "Adobe Photoshop (Photo)": "Slightly Used",
+                    "Canva": "Experienced",
+                    "Adobe Photoshop (Graphics)": "Slightly Used",
+                    "Microsoft PowerPoint": "Proficient",
+                    "Blender": "Slightly Used"
+                },
+                "experience": {
+                    "Audio Editing": "Done A Little",
+                    "Video Editing": "Done A Little",
+                    "Photo Editing": "Done A Little",
+                    "Infographic Creation": "Experienced",
+                    "Photography": "Done A Little",
+                    "Videography": "Done A Little",
+                    "Animation Creation": "Done A Little"
+                }
+            },
+            {
+                "name": "Wen Wu",
+                "email": "WUW3 at my.erau.edu",
+                "skills": {
+                    "Audacity": "Experienced",
+                    "Adobe Audition": "Slightly Used",
+                    "iMovie": "Experienced",
+                    "Adobe Premiere Pro": "Experienced",
+                    "Adobe Lightroom Classic": "Experienced",
+                    "Adobe Photoshop (Photo)": "Experienced",
+                    "Canva": "Experienced",
+                    "Adobe Illustrator": "Experienced",
+                    "Adobe Photoshop (Graphics)": "Experienced",
+                    "Microsoft PowerPoint": "Proficient",
+                    "Adobe InDesign": "Proficient",
+                    "Adobe After Effects": "Can Manage"
+                },
+                "experience": {
+                    "Audio Editing": "Experienced",
+                    "Video Editing": "Experienced",
+                    "Photo Editing": "Experienced",
+                    "Infographic Creation": "Experienced",
+                    "Photography": "Experienced",
+                    "Videography": "Experienced",
+                    "Animation Creation": "Done A Little"
+                }
+            },
+            {
+                "name": "Zoey Hart",
+                "email": "HARTZ3 at my.erau.edu",
+                "skills": {
+                    "Audacity": "Can Manage",
+                    "Adobe Audition": "Can Manage",
+                    "iMovie": "Can Manage",
+                    "Adobe Premiere Pro": "Can Manage",
+                    "Adobe Lightroom Classic": "Slightly Used",
+                    "Adobe Photoshop (Photo)": "Slightly Used",
+                    "Canva": "Proficient",
+                    "Adobe Illustrator": "Proficient",
+                    "Adobe Photoshop (Graphics)": "Can Manage",
+                    "Microsoft PowerPoint": "Proficient",
+                    "Adobe InDesign": "Can Manage"
+                },
+                "experience": {
+                    "Audio Editing": "Done A Little",
+                    "Video Editing": "Done A Little",
+                    "Photo Editing": "Done A Little",
+                    "Infographic Creation": "Experienced",
+                    "Photography": "Done A Little",
+                    "Videography": "Done A Little",
+                    "Animation Creation": "Done A Little"
+                }
+            }
+        ];
+        
+        const allSoftware = ["Adobe After Effects", "Adobe Audition", "Adobe Illustrator", "Adobe InDesign", "Adobe Lightroom Classic", "Adobe Photoshop (Photo)", "Adobe Photoshop (Graphics)", "Adobe Premiere Pro", "Audacity", "Blender", "Canva", "Microsoft PowerPoint", "iMovie"];
+        const skillLevels = ["Slightly Used", "Can Manage", "Proficient", "Experienced"];
+
+        let filteredData = [...teamData];
+
+        function init() {
+            populateFilters();
+            renderTeamGrid();
+            updateStats();
+            setupEventListeners();
+        }
+
+        function populateFilters() {
+            const softwareFilter = document.getElementById('softwareFilter');
+            const skillFilter = document.getElementById('skillFilter');
+
+            allSoftware.sort().forEach(software => {
+                const option = document.createElement('option');
+                option.value = software;
+                option.textContent = software;
+                softwareFilter.appendChild(option);
+            });
+
+            skillLevels.forEach(level => {
+                const option = document.createElement('option');
+                option.value = level;
+                option.textContent = level;
+                skillFilter.appendChild(option);
+            });
+        }
+
+        function getSkillClass(level) {
+            return 'skill-' + level.toLowerCase().replace(/\s+/g, '-');
+        }
+
+        function getExperienceClass(level) {
+            return 'experience-' + level.toLowerCase().replace(/\s+/g, '-');
+        }
+
+        function createPersonCard(person) {
+            const skillsHtml = Object.entries(person.skills)
+                .map(([software, level]) => 
+                    `<span class="skill-tag ${getSkillClass(level)}">${software}</span>`
+                ).join('');
+
+            const experienceHtml = Object.entries(person.experience)
+                .filter(([_, level]) => level !== 'Willing To Learn') 
+                .map(([category, level]) => 
+                    `<span class="experience-tag ${getExperienceClass(level)}">${category}: ${level}</span>`
+                ).join('');
+
+            return `
+                <div class="person-card" onclick="toggleCard(this)">
+                    <div class="person-header">
+                        <div class="person-name">${person.name}</div>
+                        <div class="person-email">${person.email}</div>
+                    </div>
+                    <div class="skills-section">
+                        <h3>Software Skills (${Object.keys(person.skills).length})</h3>
+                        <div class="skills-list">
+                            ${skillsHtml || '<span style="color: #999; font-style: italic;">No skills listed</span>'}
+                        </div>
+                    </div>
+                    <div class="work-experience">
+                        <h3>Work Experience</h3>
+                        <div class="experience-list">
+                            ${experienceHtml || '<span style="color: #999; font-style: italic;">Willing to learn in all areas</span>'}
+                        </div>
+                    </div>
+                    <div class="expand-indicator">
+                        <span class="expand-text">Click to see work experience</span>
+                        <span class="collapse-text" style="display: none;">Click to collapse</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTeamGrid() {
+            const teamGrid = document.getElementById('teamGrid');
+            const noResults = document.getElementById('noResults');
+
+            if (filteredData.length === 0) {
+                teamGrid.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            teamGrid.style.display = 'grid';
+            noResults.style.display = 'none';
+
+            teamGrid.innerHTML = filteredData
+                .map(person => createPersonCard(person))
+                .join('');
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const softwareFilter = document.getElementById('softwareFilter').value;
+            const skillFilter = document.getElementById('skillFilter').value;
+
+            filteredData = teamData.filter(person => {
+                const matchesSearch = !searchTerm || 
+                    person.name.toLowerCase().includes(searchTerm) ||
+                    person.email.toLowerCase().includes(searchTerm) ||
+                    Object.keys(person.skills).some(software => 
+                        software.toLowerCase().includes(searchTerm)
+                    );
+
+                const matchesSoftware = !softwareFilter || 
+                    (person.skills[softwareFilter] && (!skillFilter || person.skills[softwareFilter] === skillFilter));
+                
+                const matchesSkill = !skillFilter || 
+                    (!softwareFilter && Object.values(person.skills).includes(skillFilter));
+
+                return matchesSearch && (matchesSoftware || matchesSkill);
+            });
+
+            renderTeamGrid();
+            updateStats();
+        }
+
+        function updateStats() {
+            const statsText = document.getElementById('statsText');
+            const totalSkills = teamData.reduce((sum, person) => sum + Object.keys(person.skills).length, 0);
+            
+            statsText.textContent = `Showing ${filteredData.length} of ${teamData.length} team members • ${totalSkills} total skills tracked`;
+        }
+
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+            document.getElementById('softwareFilter').addEventListener('change', applyFilters);
+            document.getElementById('skillFilter').addEventListener('change', applyFilters);
+        }
+
+        function toggleCard(cardElement) {
+            const workExperience = cardElement.querySelector('.work-experience');
+            const expandText = cardElement.querySelector('.expand-text');
+            const collapseText = cardElement.querySelector('.collapse-text');
+            
+            cardElement.classList.toggle('expanded');
+            workExperience.classList.toggle('visible');
+            
+            const isExpanded = cardElement.classList.contains('expanded');
+            expandText.style.display = isExpanded ? 'none' : 'inline';
+            collapseText.style.display = isExpanded ? 'inline' : 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
